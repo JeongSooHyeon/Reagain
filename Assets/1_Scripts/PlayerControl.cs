@@ -29,8 +29,8 @@ public class PlayerControl : MonoBehaviour
     void Update()
     {
         GetInput();
-        Move();
-        Turn();
+        //Move();
+        //Turn();
         Jump();
     }
 
