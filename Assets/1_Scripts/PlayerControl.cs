@@ -4,21 +4,19 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    [SerializeField] float speed;
-    [SerializeField] float rSpeed;
     [SerializeField] float jPower;
 
-    float hAxis;
-    float vAxis;
-    bool rDown;
     bool jDown;
+    bool fDown;
 
     bool isJump;
-
-    Vector3 moveVec;
+    public bool isFireReady;
 
     Rigidbody rigid;
     Animator anim;
+
+    [SerializeField] Sword sword;
+    float fireDelay;
 
     void Awake()
     {
@@ -29,32 +27,16 @@ public class PlayerControl : MonoBehaviour
     void Update()
     {
         GetInput();
-        //Move();
-        //Turn();
         Jump();
+        Attack();
     }
 
     void GetInput()
     {
-        hAxis = Input.GetAxisRaw("Horizontal");
-        vAxis = Input.GetAxisRaw("Vertical");
-        rDown = Input.GetButton("Run");
+        //hAxis = Input.GetAxisRaw("Horizontal");
+        //vAxis = Input.GetAxisRaw("Vertical");
         jDown = Input.GetButtonDown("Jump");
-    }
-
-    void Move()
-    {
-        moveVec = new Vector3(hAxis, 0, vAxis).normalized;
-
-        transform.position += moveVec * speed * (rDown ? rSpeed : 1f) * Time.deltaTime;
-
-        anim.SetBool("isWalk", moveVec != Vector3.zero);
-        anim.SetBool("isRun", rDown);
-    }
-
-    void Turn()
-    {
-        transform.LookAt(transform.position + moveVec);
+        fDown = Input.GetButtonDown("Fire1");
     }
 
     void Jump()
@@ -66,6 +48,21 @@ public class PlayerControl : MonoBehaviour
             anim.SetTrigger("doJump");
             isJump = true;
         }
+    }
+
+    void Attack()
+    {
+        fireDelay += Time.deltaTime;
+        isFireReady = sword.rate < fireDelay;
+
+        if(fDown && isFireReady)
+        {
+            sword.Use();
+            anim.SetTrigger("doAttack");
+            fireDelay = 0;
+
+        }
+
     }
 
     private void OnCollisionEnter(Collision collision)

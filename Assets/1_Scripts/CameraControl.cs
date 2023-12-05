@@ -4,20 +4,17 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-    [SerializeField]
-    Transform characterBody;
-    [SerializeField]
-    Transform cameraArm;
+    [SerializeField] Transform characterBody;
+    [SerializeField] Transform cameraArm;
 
-    [SerializeField]
-    float speed;
+    Vector3 moveDir;
 
-    [SerializeField]
-    Animator anim;
-    void Start()
-    {
-        
-    }
+    bool rDown;
+
+    [SerializeField] float speed;
+    [SerializeField] float rSpeed;
+
+    [SerializeField] Animator anim;
 
     void Update()
     {
@@ -31,15 +28,25 @@ public class CameraControl : MonoBehaviour
 
         bool isMove = moveInput.magnitude != 0;
         anim.SetBool("isWalk", isMove);
+
+        if (!characterBody.gameObject.GetComponent<PlayerControl>().isFireReady)
+        {
+            isMove = false;
+            moveDir=Vector3.zero;
+        }
         if (isMove)
         {
+            rDown = Input.GetButton("Run");
+            anim.SetBool("isRun", rDown);
+
             Vector3 lookForward = new Vector3(cameraArm.forward.x, 0f, cameraArm.forward.z).normalized;
             Vector3 lookRight = new Vector3(cameraArm.right.x, 0f, cameraArm.right.z).normalized;
-            Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
+            moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
 
             characterBody.forward = moveDir;
-            transform.position += moveDir * 5f * Time.deltaTime;
+   
         }
+        transform.position += moveDir * speed * (rDown ? rSpeed : 1f) * Time.deltaTime;
     }
 
     void LookAround()
