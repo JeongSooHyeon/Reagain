@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class PlayerControl : MonoBehaviour
 
     bool isJump;
     public bool isFireReady;
+
+    public bool cantMove;
 
     Rigidbody rigid;
     Animator anim;
@@ -27,21 +30,17 @@ public class PlayerControl : MonoBehaviour
     void Update()
     {
         GetInput();
-        Jump();
         Attack();
     }
 
     void GetInput()
     {
-        //hAxis = Input.GetAxisRaw("Horizontal");
-        //vAxis = Input.GetAxisRaw("Vertical");
-        jDown = Input.GetButtonDown("Jump");
         fDown = Input.GetButtonDown("Fire1");
     }
 
-    void Jump()
+    void OnJump()
     {
-        if (jDown && !isJump)
+        if (!isJump)
         {
             rigid.AddForce(Vector3.up * jPower, ForceMode.Impulse);
             anim.SetBool("isJump", true);
@@ -55,13 +54,15 @@ public class PlayerControl : MonoBehaviour
         fireDelay += Time.deltaTime;
         isFireReady = sword.rate < fireDelay;
 
-        if(fDown && isFireReady)
+        if (fDown && isFireReady)
         {
             sword.Use();
             anim.SetTrigger("doAttack");
             fireDelay = 0;
-
+            cantMove = true;
         }
+        else
+            cantMove = false;
 
     }
 
@@ -73,4 +74,5 @@ public class PlayerControl : MonoBehaviour
             isJump = false;
         }
     }
+
 }
