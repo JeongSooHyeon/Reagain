@@ -21,13 +21,28 @@ public class CameraControl : MonoBehaviour
     [SerializeField] float speed;
     [SerializeField] float rSpeed;
 
+    [SerializeField] CameraInputAction cameraInputAction;   // 카메라 InputAction
+    [SerializeField] CameraInputAction.TpsCameraActions cameraActions;
     [SerializeField] Animator anim;
 
     private void Awake()
     {
+        cameraInputAction = new CameraInputAction();
+        cameraActions = cameraInputAction.TpsCamera;
+
         Application.targetFrameRate = 30;   // 프레임 고정
-        mouseDelta = Vector2.zero;
     }
+
+    // 카메라 오브젝트가 비활성호하라면 사용하지 않기 위해
+    private void OnEnable()
+    {
+        cameraInputAction.Enable();
+    }
+    private void OnDisable()
+    {
+        cameraInputAction.Disable();
+    }
+
     void FixedUpdate()
     {
         LookAround();
@@ -40,7 +55,7 @@ public class CameraControl : MonoBehaviour
         Debug.Log("다시 걸어");
     }
 
-    void Move()
+    public void Move()
     {
         isMove = inputVec.magnitude != 0;
         anim.SetBool("isWalk", isMove);
@@ -76,6 +91,10 @@ public class CameraControl : MonoBehaviour
       //  inputVec = Vector3.zero;
     }
 
+    void OnLook(InputValue value)
+    {
+        
+    }
     void LookAround()
     {
         mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * 2.0f); // 마우스 움직인 수치
